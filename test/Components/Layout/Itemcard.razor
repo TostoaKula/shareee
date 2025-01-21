@@ -1,0 +1,68 @@
+﻿@using test.Components.Services;
+@using test.Components.Data
+@inject ItemService ItemService
+
+
+
+<h3>Itemcard</h3>
+
+@if (items == null)
+{
+    Console.WriteLine("loading items");
+    <p>Loading...</p>
+
+}
+else
+{
+    <div class="row">
+        @foreach (var item in items)
+        {
+            <div class="col-md-4" style="background-color: #f8f9fa; padding: 15px; border: 1px solid #dee2e6;">
+                <div class="card" style="background-color: #f8f9fa; padding: 15px; border: 1px solid #dee2e6;">
+                    <div class="card-header">
+                        <h5>@item.Name</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>@item.Description</p>
+                        <p><strong>Price: $@item.Price</strong></p>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn">Buy Now</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<Item> items;
+    private string debugMessage = "Initializing...";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            debugMessage = "Fetching items...";
+            Console.WriteLine("Fetching items from API...");
+
+            items = await ItemService.GetitemsAsync();
+
+            if (items != null && items.Count > 0)
+            {
+                debugMessage = $"{items.Count} items loaded.";
+                Console.WriteLine($"{items.Count} items loaded.");
+            }
+            else
+            {
+                debugMessage = "No items found.";
+                Console.WriteLine("No items found.");
+            }
+        }
+        catch (Exception ex)
+        {
+            debugMessage = "An error occurred while fetching items.";
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+}

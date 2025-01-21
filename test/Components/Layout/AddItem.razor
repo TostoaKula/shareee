@@ -1,0 +1,73 @@
+﻿@page "/additem"
+@using test.Components.Data
+@using test.Components.Services
+@inject ItemService ItemService
+
+<h3>Add New Item</h3>
+
+<div class="form-group">
+    <label for="name">Name:</label>
+    <input type="text" id="name" class="form-control" @bind="newItem.Name" />
+</div>
+
+<div class="form-group">
+    <label for="description">Description:</label>
+    <textarea id="description" class="form-control" @bind="newItem.Description"></textarea>
+</div>
+
+<div class="form-group">
+    <label for="price">Price:</label>
+    <input type="number" id="price" class="form-control" @bind="newItem.Price" />
+</div>
+
+<div class="form-group">
+    <label for="isAvailable">Available:</label>
+    <input type="checkbox" id="isAvailable" class="form-check-input" @bind="newItem.IsAvailable" />
+</div>
+
+<button class="btn btn-primary" @onclick="SubmitItem">Add Item</button>
+<button class="btn btn-primary" @onclick="TestClick">Test Button</button>
+
+
+@if (!string.IsNullOrEmpty(debugMessage))
+{
+    <p class="text-muted">@debugMessage</p>
+}
+
+@code {
+    private Item newItem = new Item();
+    private string debugMessage;
+
+    private void TestClick()
+    {
+        debugMessage = "button clicked";
+        Console.WriteLine("Button clicked!");
+    }
+    private async Task SubmitItem()
+    {
+        debugMessage = "Submitting..."; // Show "Submitting" while the request is being processed.
+
+        // Log to check if method is triggered
+        Console.WriteLine("SubmitItem method triggered.");
+
+        // Call the AddItemAsync method from ItemService to submit the new item.
+        try
+        {
+            debugMessage = await ItemService.AddItemAsync(newItem);
+            Console.WriteLine($"Item: {newItem.Name}, {newItem.Description}, {newItem.Price}, {newItem.IsAvailable}");
+            Console.WriteLine($"Received response: {debugMessage}");
+        }
+        catch (Exception ex)
+        {
+            // Handle any unexpected errors
+            debugMessage = $"Error: {ex.Message}";
+            Console.WriteLine($"Error during submission: {ex.Message}");
+        }
+
+        // If the submission is successful, reset the form.
+        if (debugMessage == "Item submitted successfully!")
+        {
+            newItem = new Item(); // Reset form
+        }
+    }
+}
