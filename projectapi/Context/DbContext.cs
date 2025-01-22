@@ -12,6 +12,7 @@ namespace projectapi.Context
         }
 
         public DbSet<Item> Items { get; set; }
+        public DbSet<User> Users { get; set; }
 
         public override int SaveChanges()
         {
