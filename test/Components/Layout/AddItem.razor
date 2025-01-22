@@ -41,12 +41,12 @@
   
     private async Task SubmitItem()
     {
-        debugMessage = "Submitting..."; // Show "Submitting" while the request is being processed.
+        debugMessage = "Submitting..."; 
 
-        // Log to check if method is triggered
+        
         Console.WriteLine("SubmitItem method triggered.");
 
-        // Call the AddItemAsync method from ItemService to submit the new item.
+       
         try
         {
             debugMessage = await ItemService.AddItemAsync(newItem);
@@ -55,15 +55,15 @@
         }
         catch (Exception ex)
         {
-            // Handle any unexpected errors
+           
             debugMessage = $"Error: {ex.Message}";
             Console.WriteLine($"Error during submission: {ex.Message}");
         }
 
-        // If the submission is successful, reset the form.
+       
         if (debugMessage == "Item submitted successfully!")
         {
-            newItem = new Item(); // Reset form
+            newItem = new Item(); 
         }
     }
 }

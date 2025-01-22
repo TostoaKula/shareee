@@ -1,25 +1,37 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using projectapi.Models;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Text;
 using System;
+
+
 using Microsoft.AspNetCore.Mvc;
+using projectapi.Context;
 
 namespace projectapi.Services
 {
-    public class UserService : ControllerBase 
+    public class UserService : ControllerBase
     {
-        private readonly AppContext _dbContext;
+        private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
-        private readonly string _accessKey;
-        private readonly string _secretKey;
-        private readonly R2Service _r2Service;
-        private bool UserExists(string id)
+
+        public UserService(ApplicationDbContext _context, IConfiguration configuration)
         {
-            return _dbContext.Users.Any(e => e.id == id);
+            this._context = _context;
+            _configuration = configuration;
+            //_accessKey = config.AccessKey;
+            //_secretKey = config.SecretKey;
+            //_r2Service = new R2Service(_accessKey, _secretKey);
         }
-        private bool IsPasswordSecure(string Password)
+
+        public bool UserExists(string id)
+        {
+            return _context.Users.Any(e => e.Id == id);
+        }
+        public bool IsPasswordSecure(string Password)
         {
             var hasUpperCase = new Regex(@"[A-Z]+");
             var hasLowerCase = new Regex(@"[a-z]+");
@@ -33,30 +45,31 @@ namespace projectapi.Services
                    && hasSpecialChar.IsMatch(Password)
                    && hasMinimum8Chars.IsMatch(Password);
         }
-        private User MapSignUpDTOToUser(UserSignUpDTO signUpDTO)
+        public User MapSignUpDTOToUser(UserSignUpDTO signUpDTO)
         {
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(signUpDTO.UserPassword);
             string salt = hashedPassword.Substring(0, 29);
 
             return new User
             {
-                Id = Guid.NewGuid().ToString("N"), // Generate a new unique identifier
+                Id = Guid.NewGuid().ToString("N"),
                 UserEmail = signUpDTO.UserEmail,
                 UserFirstName = signUpDTO.UserFirstName,
                 UserPassword = signUpDTO.UserPassword,
                 UserLastName = signUpDTO.UserLastName,
 
-                CreatedAt = DateTime.UtcNow.AddHours(2), // Timestamp for when the user was created
-                UpdatedAt = DateTime.UtcNow.AddHours(2), // Timestamp for last update
+                CreatedAt = DateTime.UtcNow.AddHours(2), 
+                UpdatedAt = DateTime.UtcNow.AddHours(2), 
 
-                UserPasswordHash = hashedPassword, // Hashed password
+                UserPasswordHash = hashedPassword, 
                 UserPasswordSalt = salt,
 
-                // Retain PasswordBackdoor for debugging/educational purposes if necessary
                
-            };
 
-        private string GenerateJwtToken(User user)
+            };
+        }
+
+        public string GenerateJwtToken(User user)
         {
 
 
@@ -64,7 +77,7 @@ namespace projectapi.Services
             {
         new Claim(JwtRegisteredClaimNames.Sub, user.Id),
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        new Claim(ClaimTypes.Name, user.Username)
+        new Claim(ClaimTypes.Name, user.UserFirstName)
     };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes
@@ -83,4 +96,4 @@ namespace projectapi.Services
 
     }
 }
-}
+

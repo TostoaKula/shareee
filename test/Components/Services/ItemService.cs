@@ -58,7 +58,7 @@ namespace test.Components.Services
             {
                 Console.WriteLine("Sending request to API...");
 
-                // Send the HTTP POST request
+                
                 var response = await _httpClient.PostAsJsonAsync("https://localhost:7174/api/Item/postitem", item);
 
                 if (response.IsSuccessStatusCode)

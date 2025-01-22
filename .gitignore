@@ -63,3 +63,6 @@ out/
 *.v2
 *.vsidx
 *.json
+*.db
+*.db-shm
+*.db-wal
