@@ -12,7 +12,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["projectapi/projectapi.csproj", "projectapi/"]
+COPY ["projectapi.csproj", "projectapi/"]
 RUN dotnet restore "./projectapi/projectapi.csproj"
 COPY . .
 WORKDIR "/src/projectapi"
